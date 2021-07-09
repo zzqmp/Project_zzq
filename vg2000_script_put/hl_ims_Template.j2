@@ -1,0 +1,50 @@
+conf t
+host ims.hl.chinamobile.com {{ims_ip}}
+callrouting-conf
+  dial-peer 1 pots slot 1
+   {%- for i in range(0,row_num) %}
+     channel {{i}} {{i}} destination-pattern {{tel_bg_num[0][i]}}
+     channel {{i}} {{i}} username 86{{area_id}}{{tel_bg_num[0][i]}}@ims.hl.chinamobile.com password {{tel_bg_num[2][i]}}
+   {%- endfor %}
+   exit
+  {%- if tel_col_num == 3 %}
+  dial-peer 10 pots slot 1
+     {%- for i in range(0,row_num) %}
+     channel {{i}} {{i}} destination-pattern {{tel_bg_num[1][i]}}
+     {%- endfor %}
+    channel 0 15 registrar disable
+  {%- endif %}
+  exit
+  dial-peer 100 voip
+    destination-pattern xx.
+    session-target sip-server
+     exit
+  exit
+fxs-card 1
+   channel 0 15 enable
+   channel 0 15 callid enable
+exit
+interface fastethernet1
+   ip address {{ip_address}} {{netmask}}
+   sip-gateway voip interface
+   sip-gateway voip proxy domain-name ims.hl.chinamobile.com
+   sip-gateway voip registrar domain-name ims.hl.chinamobile.com
+  exit
+voicesrv-conf
+   fax-protocol pass-through
+   sip send-dtmf inband
+   sip national-code +86
+   sip area-code {{area_code}}
+   sip ignore-nomedia-ring enable
+   media-port 32768 32896
+   call-divert enable
+   user-config enable
+   user-config service-code call-divert busy set *140*x.
+   user-config service-code call-divert noanswer set *141*x.
+   user-config service-code call-divert uncondition set *157*x.
+   user-config service-code call-divert busy unset #140#
+   user-config service-code call-divert noanswer unset #141#
+   user-config service-code call-divert uncondition unset #157#
+  exit
+ip route 0.0.0.0 0.0.0.0 {{ip_gw}}
+sip-gataway

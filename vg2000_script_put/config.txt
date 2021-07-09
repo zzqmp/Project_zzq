@@ -1,0 +1,90 @@
+conf t
+host ims.hl.chinamobile.com 172.16.23.81
+callrouting-conf
+  dial-peer 1 pots slot 1
+     channel 0 0 destination-pattern 58602201
+     channel 0 0 username 8645958602201@ims.hl.chinamobile.com password aaaaaa123123123
+     channel 1 1 destination-pattern 58602202
+     channel 1 1 username 8645958602202@ims.hl.chinamobile.com password aaaaaa123123123
+     channel 2 2 destination-pattern 58602203
+     channel 2 2 username 8645958602203@ims.hl.chinamobile.com password aaaaaa123123123
+     channel 3 3 destination-pattern 58602205
+     channel 3 3 username 8645958602205@ims.hl.chinamobile.com password aaaaaa123123123
+     channel 4 4 destination-pattern 58602206
+     channel 4 4 username 8645958602206@ims.hl.chinamobile.com password aaaaaa123123123
+     channel 5 5 destination-pattern 58602207
+     channel 5 5 username 8645958602207@ims.hl.chinamobile.com password aaaaaa123123123
+     channel 6 6 destination-pattern 58602208
+     channel 6 6 username 8645958602208@ims.hl.chinamobile.com password aaaaaa123123123
+     channel 7 7 destination-pattern 58602209
+     channel 7 7 username 8645958602209@ims.hl.chinamobile.com password aaaaaa123123123
+     channel 8 8 destination-pattern 58602210
+     channel 8 8 username 8645958602210@ims.hl.chinamobile.com password aaaaaa123123123
+     channel 9 9 destination-pattern 58602212
+     channel 9 9 username 8645958602212@ims.hl.chinamobile.com password aaaaaa123123123
+     channel 10 10 destination-pattern 58602213
+     channel 10 10 username 8645958602213@ims.hl.chinamobile.com password aaaaaa123123123
+     channel 11 11 destination-pattern 58602215
+     channel 11 11 username 8645958602215@ims.hl.chinamobile.com password aaaaaa123123123
+     channel 12 12 destination-pattern 58602216
+     channel 12 12 username 8645958602216@ims.hl.chinamobile.com password aaaaaa123123123
+     channel 13 13 destination-pattern 58602217
+     channel 13 13 username 8645958602217@ims.hl.chinamobile.com password aaaaaa123123123
+     channel 14 14 destination-pattern 58602218
+     channel 14 14 username 8645958602218@ims.hl.chinamobile.com password aaaaaa123123123
+     channel 15 15 destination-pattern 58602219
+     channel 15 15 username 8645958602219@ims.hl.chinamobile.com password aaaaaa123123123
+   exit
+  dial-peer 10 pots slot 1
+     channel 0 0 destination-pattern 2201
+     channel 1 1 destination-pattern 2202
+     channel 2 2 destination-pattern 2203
+     channel 3 3 destination-pattern 2205
+     channel 4 4 destination-pattern 2206
+     channel 5 5 destination-pattern 2207
+     channel 6 6 destination-pattern 2208
+     channel 7 7 destination-pattern 2209
+     channel 8 8 destination-pattern 2210
+     channel 9 9 destination-pattern 2212
+     channel 10 10 destination-pattern 2213
+     channel 11 11 destination-pattern 2215
+     channel 12 12 destination-pattern 2216
+     channel 13 13 destination-pattern 2217
+     channel 14 14 destination-pattern 2218
+     channel 15 15 destination-pattern 2219
+    channel 0 15 registrar disable
+  
+  exit
+  dial-peer 100 voip
+    destination-pattern xx.
+    session-target sip-server
+     exit
+  exit
+fxs-card 1
+   channel 0 15 enable
+   channel 0 15 callid enable
+exit
+interface fastethernet1
+   ip address 192.168.1.1 255.255.255.0
+   sip-gateway voip interface
+   sip-gateway voip proxy domain-name ims.hl.chinamobile.com
+   sip-gateway voip registrar domain-name ims.hl.chinamobile.com
+  exit
+voicesrv-conf
+   fax-protocol pass-through
+   sip send-dtmf inband
+   sip national-code +86
+   sip area-code 0459
+   sip ignore-nomedia-ring enable
+   media-port 32768 32896
+   call-divert enable
+   user-config enable
+   user-config service-code call-divert busy set *140*x.
+   user-config service-code call-divert noanswer set *141*x.
+   user-config service-code call-divert uncondition set *157*x.
+   user-config service-code call-divert busy unset #140#
+   user-config service-code call-divert noanswer unset #141#
+   user-config service-code call-divert uncondition unset #157#
+  exit
+ip route 0.0.0.0 0.0.0.0 192.168.1.254
+sip-gataway
